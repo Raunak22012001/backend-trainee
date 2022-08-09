@@ -101,7 +101,36 @@ router.get("/films/:filmId", function(req, res){
 
        //if there is no match give an error response
        res.send("The film id doesn't match any movie")
-})
 
+     
+
+})
+router.get("/missing", function (req, res) {
+    //logic : sum of numbers is n(n+1)/2..
+    let arr= [1,2,3,5,6,7]
+    let n=arr.length+1
+    let total=[n*(arr[0]+arr[arr.length-1])/2]
+    let sum=0
+    for(let i=0;i<arr.length;i++){
+        sum = sum+arr[i]
+    }
+    let missingNumber=total-sum
+    
+    return res.send(  { data: missingNumber  }  );
+});
+//////////////
+        
+ router.get("/sol2", function (req, res) {
+   let  arr1=[33, 34, 35, 37, 38]
+    let n=arr1.length+1
+    let total=[n*(arr1[0]+arr1[arr1.length-1])/2]
+    let sum=0
+    for(let i=0;i<arr1.length;i++){
+        sum = sum+arr1[i]
+    }
+    let missingNumber=total-sum
+    
+    return res.send(  { data: missingNumber  }  );
+});
 module.exports = router;
 // adding this comment for no reason
