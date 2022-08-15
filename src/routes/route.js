@@ -69,6 +69,8 @@ router.post("/test-post-4", function(req, res) {
     arr.push(ele)
     res.send(  { msg: arr , status: true }  )
 })
+///////////////////////
+///player problem
 
 let players =
 [
@@ -106,22 +108,69 @@ router.post("/players", function(req, res) {
     for(let i=0;i<players.length;i++){
         let newplayername=players[i]
         if(newplayer.name==newplayername.name){
-            res.send(  "this player ahe adhich"  )
+            res.send(  "this player is already exit"  )
            break; 
         }
     }
 players.push(newplayer)
 
-
-
-
-
-
-
-
-
-
     res.send(  { data: players , status: true }  )
 })
 
+
+
+//////////////////////////////////
+
+/////voting problem
+let persons=[
+    {
+       name:"pk",
+       age:10,
+       votingStatus:false
+},
+{
+    name:"sk",
+    age:20,
+    votingStatus:false
+
+},
+{
+    name:"AA",
+    age:70,
+    votingStatus:false
+
+},
+{
+    name:"SC",
+    age:5,
+    votingStatus:false
+
+},
+{
+    name:"HO",
+    age:40,
+    votingStatus:false
+
+}
+
+]
+
+router.post("/voting",function (req,res){
+
+let myage=req.query.vote
+let myarray=[];
+for(let i=0;i<persons.length;i++){
+
+    let persondetails=persons[i]
+    if(persondetails.age>myage)
+    {
+        persondetails.votingStatus=true
+        myarray.push( persondetails)
+    }
+}
+
+res.send({data:myarray,status:true})
+
+
+})
 module.exports = router;
