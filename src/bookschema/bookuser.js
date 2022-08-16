@@ -10,7 +10,6 @@ const bookSchema = new mongoose.Schema({
     authorName :
     {
         type: String,
-        unique: false,
         required: true
     },
     category: String,
@@ -18,4 +17,4 @@ const bookSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-module.exports = mongoose.model('BookandAuthorData',bookSchema)
+module.exports = mongoose.model('BookData',bookSchema)

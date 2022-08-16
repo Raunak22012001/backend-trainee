@@ -1,9 +1,9 @@
 const BookModelUser = require("../bookschema/bookuser")
 
 const createbookdata = async function (req, res) {
-    let getData = req.body
-    let myData = await BookModelUser.create(getData)
-    res.send({ msg: myData })
+    let Data = req.body
+    let finaldata = await BookModelUser.create(Data)
+    res.send({ msg: finaldata })
 }
 
    const getbookdata = async function (req, res) {
