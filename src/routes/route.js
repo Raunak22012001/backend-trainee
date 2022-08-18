@@ -54,5 +54,5 @@ router.get("/booklist", newbookcontroller.booklist)
 
 router.get("/updatePrice", newbookcontroller.updatePrice)
 
-
+router.get("/books", newbookcontroller.books)
 module.exports = router;
