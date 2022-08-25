@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect("mongodb+srv://Raunak22012001:8329059512%40Ujwal@cluster0.tagnbhk.mongodb.net/Raunak_db?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
-.then( () => console.log("MongoDb is connected"))
-.catch ( err => console.log(err) )
+    .then(() => console.log("MongoDb is connected"))
+    .catch(err => console.log(err))
 
 // app.use (
 //     function (req, res, next) {
@@ -20,7 +20,14 @@ mongoose.connect("mongodb+srv://Raunak22012001:8329059512%40Ujwal@cluster0.tagnb
 //         next();
 //   }
 //   );
-  
+app.use(
+    function (req, res, next) {
+        let currentDate = new Date().toLocaleString()
+        console.log("I Am Inside The Global Middleware")
+        console.log(currentDate, req.ip, req.originalUrl)
+        next();
+    }
+)
 
 app.use('/', route);
 
