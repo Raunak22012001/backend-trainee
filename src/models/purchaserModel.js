@@ -15,7 +15,8 @@ const purchaserSchema = new mongoose.Schema({
     },
     isFreeAppUser : {
         type:Boolean,
-        default : false
+        default : false,
+        require:true
     }
 
 },{timestamps:true})
