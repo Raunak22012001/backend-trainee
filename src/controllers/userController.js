@@ -31,7 +31,7 @@ const loginUser = async function (req, res) {
 
   let token = jwt.sign(
     {
-
+      
       userId: user._id.toString(),
       batch: "thorium",
       organisation: "FunctionUp",
@@ -42,32 +42,14 @@ const loginUser = async function (req, res) {
   res.send({ status: true, token: token });
 };
 
-
-
-
-
-
 //////////get user data
 
 const getUserData = async function (req, res) {
   
-  let token = req.headers["x-Auth-token"];
-  if (!token) token = req.headers["x-auth-token"];
-
-  
-    if (!token) return res.send({ status: false, msg: "token must be present" });
-
-   console.log(token);
-
-  
-  let decodedToken = jwt.verify(token, "functionup-plutonium-very-very-secret-key");
-  if (!decodedToken)
-    return res.send({ status: false, msg: "token is invalid" });
-
-  let userId = req.params.userId;
+  let userId = req.params.userId
   let userDetails = await userModel.findById(userId);
   if (!userDetails)
-    return res.send({ status: false, msg: "No such user exists" });
+   return res.send({ status: false, msg: "No such user exists" });
 
   res.send({ status: true, data: userDetails });
   // Note: Try to see what happens if we change the secret while decoding the token
@@ -95,23 +77,15 @@ const updateUser = async function (req, res) {
   res.send({ status: updatedUser, data: updatedUser });
 };
 /////////////delete user
-const deleteUser = async function(req,res){
-  let userId =  req.params.userId
-  
-  let userDetails = await userModel.findById(userId);
-  if (!userDetails)
-    return res.send({ status: false, msg: "No such user exists" });
-
-  let userdata = req.body
-  let deletUser1 = await userModel.findByIdAndDelete(userId)
-  res.send({status : true, msg : "User is deleted"})   
+const deleteUser = async function(req, res) {    
+  let userId = req.params.userId
+  let user = await userModel.findById(userId)
+  if(!user) {
+      return res.send({status: false, message: "no such user exists"})
+  }
+  let updatedUser = await userModel.findOneAndUpdate({_id: userId},{$set : {isDeleted: true}}, {new: true})
+  res.send({status: true, data: updatedUser})
 }
-
-
-
-
-
-
 
 
 module.exports.createUser = createUser;
