@@ -1,95 +1,131 @@
 const jwt = require("jsonwebtoken");
+const { findByIdAndDelete, findById, findOneAndDelete } = require("../models/userModel");
 const userModel = require("../models/userModel");
 
-/*
-  Read all the comments multiple times to understand why we are doing what we are doing in login api and getUserData api
-*/
 
-
-/////////create user
+//__________________________________Creating User___________________________________
 const createUser = async function (req, res) {
-  
-  let data = req.body;
-  let savedData = await userModel.create(data);
- res.send({ msg: savedData });
+  try{
+    let data = req.body
+    if(Object.keys(data).length != 0){
+      let savedData = await userModel.create(data);
+      res.status(201).send({ msg: savedData });
+    }
+    else{
+      res.status(400).send({msg : "Bad Request/ No data send"})
+    }
+  }
+
+  catch(err){
+     res.status(500).send({msg : "Error", error : err.message})
+  }
+    
 };
 
 
+//__________________________________User Login & Generating Token__________________________________________________
 
-////login user
+
 const loginUser = async function (req, res) {
-  let userName = req.body.emailId;
-  let password = req.body.password;
+  try{
+    let userName = req.body.emailId;
+    let password = req.body.password;
 
-  let user = await userModel.findOne({ emailId: userName, password: password });
-  if (!user)
-    return res.send({
-      status: false,
-      msg: "username or the password is not corerct",
-    });
+    //If there is no Login data or no login data provided
+    if(!userName || !password){
+      res.status(400).send({msg : "Bad Request. Username and Password is Mandatory"})
+    }
 
-
-  let token = jwt.sign(
-    {
+    //Login data provided
+    else{
+      try{
+        // Proper Login Details and User Found
+        let user = await userModel.findOne({ emailId: userName, password: password });
+          let token = jwt.sign(
+            {
+              firstName : user.firstName,
+              lastName : user.lastName,
+              userId: user._id.toString(),
+              batch: "plutonium",
+              organisation: "FunctionUp",
+            },
+            "itisaverysecretcodezaybxc"
+          );
+          res.status(200).send({status: true, msg : token})        
+      }
       
-      userId: user._id.toString(),
-      batch: "thorium",
-      organisation: "FunctionUp",
-    },
-    "functionup-plutonium-very-very-secret-key"
-  );
-  res.setHeader("x-auth-token", token);
-  res.send({ status: true, token: token });
+      // In this case no User found with given login details
+      catch(err){
+        res.status(401).send({msg : "Error! UnAuthorized User", error : err.message})
+      }
+    }
+  }
+
+  catch(err){
+     res.status(500).send({msg : "Error", error : err.message})
+  }
+  
 };
 
-//////////get user data
+
+
+//________________________________________Get User Details__________________________________________________
+
 
 const getUserData = async function (req, res) {
-  
-  let userId = req.params.userId
+  let userId = req.params.userId;
   let userDetails = await userModel.findById(userId);
-  if (!userDetails)
-   return res.send({ status: false, msg: "No such user exists" });
-
   res.send({ status: true, data: userDetails });
-  // Note: Try to see what happens if we change the secret while decoding the token
 };
 
 
 
 
-
-
+//_________________________________________Update User___________________________________________________
 
 
 
 const updateUser = async function (req, res) {
-  
-  let userId = req.params.userId;
-  let user = await userModel.findById(userId);
-  //Return an error if no user with the given id exists in the db
-  if (!user) {
-    return res.send("No such user exists");
+  try{
+    let userId = req.params.userId;
+    let user = await userModel.findById(userId);
+    let userData = req.body;
+
+    
+    if(Object.keys(userData).length != 0){
+      let updatedUser = await userModel.findOneAndUpdate({ _id: userId }, userData, {new : true});
+      res.status(201).send({ status: "Modified User", data: updatedUser});     
+    }
+    
+    // In this case no data is provided for updating user
+    else{
+      res.status(400).send({msg : "Error", error : "BAD REQUEST"})
+    }
   }
 
-  let userData = req.body;
-  let updatedUser = await userModel.findOneAndUpdate({ _id: userId }, userData);
-  res.send({ status: updatedUser, data: updatedUser });
-};
-/////////////delete user
-const deleteUser = async function(req, res) {    
-  let userId = req.params.userId
-  let user = await userModel.findById(userId)
-  if(!user) {
-      return res.send({status: false, message: "no such user exists"})
+  catch(err){
+     res.status(500).send({msg : "Server Error"})
   }
+};
+
+
+
+//____________________________________Delete User__________________________________________________________
+
+
+const deleteUser1 = async function(req, res) {    
+  let userId = req.params.userId
   let updatedUser = await userModel.findOneAndUpdate({_id: userId},{$set : {isDeleted: true}}, {new: true})
   res.send({status: true, data: updatedUser})
 }
+
+
+
+
 
 
 module.exports.createUser = createUser;
 module.exports.getUserData = getUserData;
 module.exports.updateUser = updateUser;
 module.exports.loginUser = loginUser;
-module.exports.deleteUser=deleteUser
+module.exports.deletUser1 = deleteUser1

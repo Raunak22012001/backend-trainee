@@ -1,56 +1,62 @@
 const jwt = require("jsonwebtoken");
-const route = require("../routes/route");
-const userModel = require("../models/userModel");
+const router = require("../routes/route");
+const userModel = require("../models/userModel")
 
-///Authentication
+//__________________________________AUTHENTICATION____________________________________
 
-const Authenticate = async function (req, res, next) {
 
-    let token = req.headers["x-Auth-token"];
-    if (!token) token = req.headers["x-auth-token"];
 
-    if (!token) return res.send({ status: false, msg: "Token is Compulsory" });
+const authenticate = async function(req, res, next) {
+    try{
+        let token = req.headers['x-auth-token'];
+        let validUser = req.params.userId
 
-     let user = req.params.userId
+//____________Checking Token is Present or not______________________________
+        if(!token) 
+        return res.status(401).send({ status: false, msg: "Token must be present" });
 
-    let newUser = await userModel.findById(user)
-    if (!newUser) return res.send({ status: false, msg: "Invalid User Enter Valid User " });
 
-    let decodedToken = jwt.verify(token, "functionup-plutonium-very-very-secret-key");
-    if (!decodedToken) return res.send({ status: false, msg: "Token is invalid" });
+//____________Checking Valid User___________________________________________
+        let userDetails = await userModel.findById(validUser);
+        if (!userDetails)
+        return res.status(401).send({ status: false, msg: "No such user exists" });
 
-    else {
-        req.decodedToken = decodedToken
-        //             key  = value
-      //  console.log(Authenticate)
+//______________Verifying Token______________________________________________
+        let newdecodedToken = jwt.verify(token, "itisaverysecretcodezaybxc");
+        req.decodedToken = newdecodedToken
         next()
 
     }
-}
-
-////Authorazition
-
-let Authorise = async function (req, res, next) {
-
-    newToken = req.decodedToken  ///acesses the vaule token by its key i. e req.decoded token
-
-    /// it will take acesses from Authenticate middleware
-
-    let newModifiedUser = req.params.userId
-    let loginedinUser = newToken.userId  //stroing the data of newtoken into loginedinuser i.e user id
-
-    if (newModifiedUser != loginedinUser) return res.send({status:false,msg:"Acesses Deny You don't have Authority for Acesses "});
-
-    else{
-        next()
+    
+//__________________Token is Invalid_____________________________________________    
+    catch(err){
+        res.status(401).send({msg : "Invalid Token", error : err.message})
     }
 }
-module.exports.Authenticate=Authenticate
-module.exports.Authorise=Authorise
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//______________________________________AUTHORIZATION___________________________________-
 
+const authorise = async  function(req, res, next) {
+    try{
+        mydecodedToken = req.decodedToken
+        let userToBeModified = req.params.userId    
+        let userLoggedIn = mydecodedToken.userId
 
+        if(userToBeModified != userLoggedIn){         
+        return res.status(403).send({msg : "Error!", error : "Unauthorized User"})
+        }
 
+        next()
+    }
 
+    catch(err){
+        res.status(500).send({msg : "Server Error!"})
+    }    
+}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+module.exports.authenticate = authenticate
+module.exports.authorise = authorise
