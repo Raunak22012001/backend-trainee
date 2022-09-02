@@ -29,13 +29,13 @@ let createMeme = async function (req, res) {
         }
 
         let result = await axios(options)
-        console.log(result.data)
+        //console.log(result.data)
         res.status(200).send({ msg: result.data })
 
     }
 
     catch (err) {
-        console.log(err)
+       // console.log(err)
         res.status(500).send({ msg: err.message })
     }
 }
